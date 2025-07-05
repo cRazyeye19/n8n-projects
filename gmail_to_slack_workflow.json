@@ -1,0 +1,52 @@
+{
+  "name": "Gmail to Slack Notification",
+  "nodes": [
+    {
+      "id": "gmailTriggerNode",
+      "name": "Gmail Trigger",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1,
+      "position": [
+        250,
+        250
+      ],
+      "parameters": {
+        "authentication": "oAuth2",
+        "event": "messageReceived"
+      }
+    },
+    {
+      "id": "slackNode",
+      "name": "Slack",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2,
+      "position": [
+        500,
+        250
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "post",
+        "select": "channel",
+        "channelId": "#general",
+        "text": "New Email Received:\nSender: {{ $json.from.emailAddress }}\nSubject: {{ $json.subject }}\nSnippet: {{ $json.snippet }}"
+      }
+    }
+  ],
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Slack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "id": "gmail-to-slack-notification-workflow"
+}
