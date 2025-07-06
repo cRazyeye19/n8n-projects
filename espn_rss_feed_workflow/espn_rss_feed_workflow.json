@@ -1,0 +1,105 @@
+{
+  "name": "ESPN RSS Feed Generator",
+  "nodes": [
+    {
+      "id": "ScheduleTrigger",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        250,
+        300
+      ],
+      "parameters": {
+        "interval": "1h"
+      }
+    },
+    {
+      "id": "HttpRequest",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        450,
+        300
+      ],
+      "parameters": {
+        "url": "https://www.espn.ph/",
+        "responseMode": "response",
+        "jsonParameters": false,
+        "fullResponse": true,
+        "options": {
+          "encoding": "utf8"
+        }
+      }
+    },
+    {
+      "id": "Code",
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        650,
+        300
+      ],
+      "parameters": {
+        "language": "javaScript",
+        "jsCode": "const html = items[0].json.data;\nconst headlines = [];\nconst regex = /<h\\d[^>]*>(.*?)<\\/h\\d>/g;\nlet match;\nwhile ((match = regex.exec(html)) !== null) {\n  headlines.push(match[1].trim());\n}\n\nconst links = [];\nconst linkRegex = /<a\\s+(?:[^>]*?\\s+)?href=([\"'])(.*?)\\1/g;\nwhile ((match = linkRegex.exec(html)) !== null) {\n  links.push(match[2]);\n}\n\nconst rssItems = headlines.map((headline, index) => ({\n  title: headline,\n  link: links[index] || 'https://www.espn.ph/',\n  description: headline,\n  pubDate: new Date().toUTCString()\n}));\n\nreturn [{ json: { rssItems } }];"
+      }
+    },
+    {
+      "id": "XML",
+      "name": "XML",
+      "type": "n8n-nodes-base.xml",
+      "typeVersion": 1,
+      "position": [
+        850,
+        300
+      ],
+      "parameters": {
+        "mode": "jsonToxml",
+        "dataPropertyName": "xml",
+        "options": {
+          "rootName": "rss",
+          "cdata": true,
+          "headless": true
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "XML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

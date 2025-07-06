@@ -1,4 +1,4 @@
-# n8n Workflow: Gmail to Slack Notification
+# 📩 n8n Workflow: Gmail to Slack Notification
 
 Automate Slack notifications for new Gmail emails using n8n. This workflow monitors a Gmail inbox and posts formatted summaries of new emails into a specified Slack channel.
 
