@@ -1,0 +1,85 @@
+{
+  "name": "Daily Weather Forecast Email",
+  "nodes": [
+    {
+      "id": "scheduleTriggerNode",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        250,
+        250
+      ],
+      "parameters": {
+        "mode": "everyDay",
+        "hour": 7,
+        "minute": 0
+      }
+    },
+    {
+      "id": "openWeatherMapNode",
+      "name": "OpenWeatherMap",
+      "type": "n8n-nodes-base.openWeatherMap",
+      "typeVersion": 1,
+      "position": [
+        500,
+        250
+      ],
+      "parameters": {
+        "operation": "5DayForecast",
+        "locationSelection": "cityName",
+        "cityName": "London",
+        "format": "metric"
+      },
+      "credentials": {
+        "openWeatherMapApi": "yourOpenWeatherMapApiCredentialId"
+      }
+    },
+    {
+      "id": "sendEmailNode",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [
+        750,
+        250
+      ],
+      "parameters": {
+        "fromEmail": "your_email@example.com",
+        "toEmail": "your_email@example.com",
+        "subject": "Daily Weather Forecast for London",
+        "message": "Daily Weather Forecast for London:\n\n{{ $node[\"OpenWeatherMap\"].json[\"list\"].map(item => \"Date: \" + new Date(item.dt * 1000).toLocaleDateString() + \", Temp: \" + item.main.temp + \"°C, Description: \" + item.weather[0].description).join(\"\\n\") }}"
+      },
+      "credentials": {
+        "smtpAuth": "yourSmtpCredentialId"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "OpenWeatherMap",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenWeatherMap": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "id": "daily-weather-forecast-email-workflow"
+}
