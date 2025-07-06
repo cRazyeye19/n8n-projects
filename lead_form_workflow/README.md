@@ -144,7 +144,7 @@ To use this workflow, ensure the following:
 
 ## 📄 File Reference
 
-- `lead_flow_workflow.json` – Contains the full export of the automation
+- [`lead_flow_workflow.json`](lead_flow_workflow.json) – Contains the full export of the automation
 
 ---
 
